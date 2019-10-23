@@ -126,7 +126,7 @@ class HtmlView extends BaseHtmlView
 	{
 		$canDo = ContentHelper::getActions('com_csp');
 
-		ToolbarHelper::title(Text::_('COM_CSP_REPORTS'), 'generic');
+		ToolbarHelper::title(Text::_('COM_CSP_REPORTS'), 'shield-alt');
 
 		if ($canDo->get('core.edit.state'))
 		{
@@ -167,6 +167,7 @@ class HtmlView extends BaseHtmlView
 			'a.directive'    => Text::_('COM_CSP_HEADING_DIRECTIVE'),
 			'a.client'       => Text::_('JCLIENT'),
 			'a.id'           => Text::_('JGRID_HEADING_ID'),
+			'a.created'      => Text::_('COM_CSP_HEADING_CREATED'),
 		];
 	}
 }

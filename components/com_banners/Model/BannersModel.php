@@ -68,7 +68,7 @@ class BannersModel extends ListModel
 		$categoryId = $this->getState('filter.category_id');
 		$keywords   = $this->getState('filter.keywords');
 		$randomise  = ($ordering === 'random');
-		$nowDate    = $db->quote(Factory::getDate()->toSql());
+		$nowDate    = Factory::getDate()->toSql();
 
 		$query->select(
 			'a.id as id,'
@@ -85,8 +85,8 @@ class BannersModel extends ListModel
 			->from('#__banners as a')
 			->join('LEFT', '#__banner_clients AS cl ON cl.id = a.cid')
 			->where('a.state=1')
-			->where('(' . $query->isNullDatetime('a.publish_up') . ' OR a.publish_up <= ' . $db->quote($nowDate) . ')')
-			->where('(' . $query->isNullDatetime('a.publish_down') . ' OR a.publish_down >= ' . $db->quote($nowDate) . ')')
+			->where('(a.publish_up IS NULL OR a.publish_up <= ' . $db->quote($nowDate) . ')')
+			->where('(a.publish_down IS NULL OR a.publish_down >= ' . $db->quote($nowDate) . ')')
 			->where('(a.imptotal = 0 OR a.impmade <= a.imptotal)');
 
 		if ($cid)

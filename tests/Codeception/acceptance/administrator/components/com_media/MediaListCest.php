@@ -271,6 +271,7 @@ class MediaListCest
 	public function uploadSingleFileUsingToolbarButton(Media $I)
 	{
 		$testFileName = 'test-image-1.png';
+		$testFileItem = MediaListPage::item($testFileName);
 
 		$I->wantToTest('the upload of a single file using toolbar button.');
 		$I->amOnPage(MediaListPage::$url . $this->testDirectory);
@@ -278,6 +279,19 @@ class MediaListCest
 		$I->uploadFile('com_media/' . $testFileName);
 		$I->seeSystemMessage('Item uploaded.');
 		$I->seeContents([$testFileName]);
+		$I->click($testFileItem);
+		$I->click(MediaListPage::$toolbarDeleteButton);
+		$I->waitForElement(MediaListPage::$toolbarModalDeleteButton);
+		$I->waitForJsOnPageLoad();
+
+		// Sometimes the modal is still fading in
+		$I->wait(1);
+		$I->click(MediaListPage::$toolbarModalDeleteButton);
+
+		// Ensure the modal has closed
+		$I->wait(1);
+		$I->seeSystemMessage('Item deleted.');
+		$I->waitForElementNotVisible($testFileItem);
 	}
 
 	/**
@@ -328,6 +342,9 @@ class MediaListCest
 		$I->waitForJsOnPageLoad();
 		$I->click(MediaListPage::$toolbarCreateFolderButton);
 		$I->waitForJsOnPageLoad();
+
+		// Sometimes the modal is still fading in
+		$I->wait(1);
 		$I->seeElement(MediaListPage::$newFolderInputField);
 		$I->seeElement(MediaListPage::$modalConfirmButtonDisabled);
 		$I->fillField(MediaListPage::$newFolderInputField, $testFolderName);
@@ -335,6 +352,9 @@ class MediaListCest
 			return $el->isEnabled();
 		});
 		$I->click(MediaListPage::$modalConfirmButton);
+
+		// Ensure the modal has closed
+		$I->wait(1);
 		$I->seeSystemMessage('Folder created.');
 		$I->waitForElement(MediaListPage::item($testFolderName));
 		$I->seeElement(MediaListPage::item($testFolderName));
@@ -385,9 +405,16 @@ class MediaListCest
 		$I->waitForJsOnPageLoad();
 		$I->click($testFileItem);
 		$I->click(MediaListPage::$toolbarDeleteButton);
+
 		$I->waitForElement(MediaListPage::$toolbarModalDeleteButton);
+
+		// Sometimes the modal is still fading in
+		$I->wait(1);
 		$I->waitForJsOnPageLoad();
 		$I->click(MediaListPage::$toolbarModalDeleteButton);
+
+		// Ensure the modal has closed
+		$I->wait(1);
 		$I->seeSystemMessage('Item deleted.');
 		$I->waitForElementNotVisible($testFileItem);
 		$I->dontSeeElement($testFileName);
@@ -414,8 +441,14 @@ class MediaListCest
 		$I->click($testFolderItem);
 		$I->click(MediaListPage::$toolbarDeleteButton);
 		$I->waitForElement(MediaListPage::$toolbarModalDeleteButton);
+
+		// Sometimes the modal is still fading in
+		$I->wait(1);
 		$I->waitForJsOnPageLoad();
 		$I->click(MediaListPage::$toolbarModalDeleteButton);
+
+		// Ensure the modal has closed
+		$I->wait(1);
 		$I->seeSystemMessage('Item deleted.');
 		$I->waitForElementNotVisible($testFolderItem);
 		$I->dontSeeElement($testFolderItem);
@@ -437,11 +470,20 @@ class MediaListCest
 		$testFileItem1 = MediaListPage::item($testFileName1);
 		$testFileItem2 = MediaListPage::item($testFileName2);
 
-		$I->wantToTest('that it is possible to delete a single file.');
+		$I->wantToTest('that it is possible to delete multiple files.');
 		$I->amOnPage(MediaListPage::$url . $this->testDirectory);
 		$I->uploadFile('com_media/' . $testFileName1);
+		$I->waitForText('Item uploaded.');
+		$I->wait(10);
 		$I->waitForElement($testFileItem1);
+
+		// We have to clear the file input, otherwise our method of uploading the file via Codeception will upload it twice
+		$I->executeJS('document.getElementsByName(\'file\')[0].value = \'\'');
+		$I->waitForMediaLoaded();
 		$I->uploadFile('com_media/' . $testFileName2);
+		$I->waitForText('Item uploaded.');
+		$I->wait(10);
+		$I->waitForMediaLoaded();
 		$I->waitForElement($testFileItem2);
 		$I->click($testFileItem1);
 		$I->clickHoldingShiftkey($testFileItem2);
@@ -473,12 +515,19 @@ class MediaListCest
 		$I->amOnPage(MediaListPage::$url . $this->testDirectory);
 		$I->uploadFile('com_media/' . $testFileName);
 		$I->waitForElement($testFileItem);
+		$I->wait(1);
 		$I->clickOnActionInMenuOf($testFileName, MediaListPage::$renameAction);
 		$I->waitForElement(MediaListPage::$renameInputField);
+
+		// Sometimes the modal is still fading in
+		$I->wait(1);
 		$I->seeElement(MediaListPage::$renameInputField);
 		$I->seeElement(MediaListPage::$modalConfirmButton);
 		$I->fillField(MediaListPage::$renameInputField, 'test-image-1-renamed');
 		$I->click(MediaListPage::$modalConfirmButton);
+
+		// Ensure the modal has closed
+		$I->wait(1);
 		$I->seeSystemMessage('Item renamed.');
 		$I->dontSeeElement($testFileItem);
 		$I->seeElement(MediaListPage::item('test-image-1-renamed.png'));
@@ -536,12 +585,19 @@ class MediaListCest
 		$I->createDirectory('images/' . $this->testDirectory . '/' . $testFolderName);
 		$I->amOnPage(MediaListPage::$url . $this->testDirectory);
 		$I->waitForElement($testFolderItem);
+		$I->wait(1);
 		$I->clickOnActionInMenuOf($testFolderName, MediaListPage::$renameAction);
 		$I->waitForElement(MediaListPage::$renameInputField);
+
+		// Sometimes the modal is still fading in
+		$I->wait(1);
 		$I->seeElement(MediaListPage::$renameInputField);
 		$I->seeElement(MediaListPage::$modalConfirmButton);
 		$I->fillField(MediaListPage::$renameInputField, $testFolderName . '-renamed');
 		$I->click(MediaListPage::$modalConfirmButton);
+
+		// Ensure the modal has closed
+		$I->wait(1);
 		$I->seeSystemMessage('Item renamed.');
 		$I->dontSeeElement($testFolderItem);
 		$I->seeElement(MediaListPage::item($testFolderName . '-renamed'));
