@@ -222,6 +222,7 @@ class ConsoleApplication extends Application implements DispatcherAwareInterface
 				new Console\DeleteUserCommand,
 				new Console\ChangeUserPasswordCommand,
 				new Console\ListUserCommand,
+				new Console\VersionCommand,
 			]
 		);
 	}
